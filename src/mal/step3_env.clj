@@ -17,16 +17,19 @@
     (list? ast) (map #(eval-mal env %) ast)
     :else ast))
 
+(defn new-env [env kv-pairs]
+  (reduce (fn [env [k v]]
+            (e/env-set env k (eval-mal env v)))
+          (e/inner-env env)
+          kv-pairs))
+
 (defn eval-mal [env exp]
   (if (list? exp)
-    (cond
-      (empty? exp) exp
-      (= 'def! (first exp)) (get @(e/env-set env (second exp) (eval-mal env (last exp))) (second exp))
-      (= 'let* (first exp)) (eval-mal (reduce (fn [env [k v]]
-                                                (e/env-set env k (eval-mal env v)))
-                                              (e/inner-env env)
-                                              (partition 2 (second exp))) (last exp))
-      :else (apply (eval-ast env (first exp)) (eval-ast env (rest exp))))
+    (case (first exp)
+      nil exp
+      def! (get @(e/env-set env (second exp) (eval-mal env (last exp))) (second exp))
+      let* (eval-mal (new-env env (partition 2 (second exp))) (last exp))
+      (apply (eval-ast env (first exp)) (eval-ast env (rest exp))))
     (eval-ast env exp)))
 
 (defn print-mal [res]

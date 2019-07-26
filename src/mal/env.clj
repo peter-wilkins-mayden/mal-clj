@@ -4,7 +4,6 @@
   (atom {:outer outer}))
 
 (defn env-set [env key value]
-  ;(println env)
   (swap! env assoc key value)
   env)
 
@@ -12,5 +11,3 @@
   (or (get @env key)
       (when (get @env :outer) (env-get (get @env :outer) key))
       (throw (Exception. (str key " not found")))))
-
-
