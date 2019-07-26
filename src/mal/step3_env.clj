@@ -15,6 +15,8 @@
   (cond
     (symbol? ast) (e/env-get env ast)
     (list? ast) (map #(eval-mal env %) ast)
+    (map? ast) (into {} (map #(eval-mal env %) ast))
+    (vector? ast) (mapv #(eval-mal env %) ast)
     :else ast))
 
 (defn new-env [env kv-pairs]

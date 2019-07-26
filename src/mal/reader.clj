@@ -57,10 +57,13 @@
       (= "^" token)  (do (rdr-next rdr) (let [m (read-form rdr)]
                                         (list 'with-meta (read-form rdr) m)))
       (= "@" token)  (do (rdr-next rdr) (list 'deref (read-form rdr)))
+      (= ")" token) (throw (Exception. "unexpected )"))
       (= "(" token) (apply list (read-list rdr "(" ")"))
-      (= "{" token) (apply list (read-list rdr "{" "}"))
-      (= "[" token) (apply list (read-list rdr "[" "]"))
-      (= ")" token) (throw (Exception. "unbalanced form"))
+      (= "}" token) (throw (Exception. "unexpected }"))
+      (= "{" token) (apply hash-map (read-list rdr "{" "}"))
+      (= "]" token) (throw (Exception. "unexpected ]"))
+      (= "[" token) (vec (read-list rdr "[" "]"))
+
       :else (read-atom rdr))))
 
 (defn tokenize [s]

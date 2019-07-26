@@ -15,6 +15,8 @@
   (cond
     (symbol? ast) (or (get env ast) (throw (Exception. (str "undefined symbol:" ast))))
     (list? ast) (map eval-mal ast)
+    (map? ast) (into {} (map eval-mal ast))
+    (vector? ast) (mapv eval-mal ast)
     :else ast))
 
 

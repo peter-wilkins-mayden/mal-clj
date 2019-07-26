@@ -34,6 +34,8 @@
                    (cond
                      (symbol? ast) (e/env-get env ast)
                      (list? ast) (doall (map #(eval-mal env %) ast))
+                     (map? ast) (into {} (map #(eval-mal env %) ast))
+                     (vector? ast) (mapv #(eval-mal env %) ast)
                      :else ast))]
     (if (list? exp)
       (case (first exp)
